@@ -1,0 +1,14 @@
+file	data_type	rep
+../Analysis20220304/grep_quant_twist3/s55_grep_out.txt	input	1
+../Analysis20220304/grep_quant_twist3/s63_grep_out.txt	sort	1
+../Analysis20220304/grep_quant_twist3/s71_grep_out.txt	input	2
+../Analysis20220304/grep_quant_twist3/s56_grep_out.txt	sort	2
+../Analysis20220304/grep_quant_twist3/s64_grep_out.txt	input	3
+../Analysis20220304/grep_quant_twist3/s72_grep_out.txt	sort	3
+../Analysis20220304/grep_quant_twist3/s49_grep_out.txt	input	4
+../Analysis20220304/grep_quant_twist3/s57_grep_out.txt	sort	4
+
+
+
+
+
