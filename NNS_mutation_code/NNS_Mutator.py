@@ -54,6 +54,10 @@ def populate_seq(region, codon_list):
 #write file.
 def file_writer(file, aa_SEQ, names_SEQ):
 	SeqCounter = 0
+
+	#change * to X for writing, biopython defaults to asteriks. 
+	names_SEQ = [val.replace("*", "X") for val in names_SEQ]
+
 	with open(file, 'w+') as f:
 		for idx, dna_seq in enumerate(aa_SEQ):
 			f.write(">" + names_SEQ[idx] + "\n")
@@ -61,8 +65,8 @@ def file_writer(file, aa_SEQ, names_SEQ):
 			SeqCounter += 1
 	print("Sequences written: ", SeqCounter)
 
-def create_seqs(region, filename):
-	names_SEQ, aa_SEQ = populate_seq(region, codon_list)	
+def create_seqs(regionA, filename):
+	names_SEQ, aa_SEQ = populate_seq(regionA, codon_list)	
 	file_writer(filename, aa_SEQ, names_SEQ)
 
 #parse the json file.
