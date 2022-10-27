@@ -1,6 +1,15 @@
-#BTK_regional_mutagenesis.py
-#saraste dimer
-#TJE 2021 09 22
+##############################
+# NNS_Mutator.py
+# Timothy J. Eisen
+# Written 2021 09 22
+# Updated 2022 10 26
+# 3 positional arguments required: 
+#      1. INPUT (json format)
+#      2. Name of sequence (str, must match an entry in the json file)
+#      3. Output (fasta format)
+##############################
+
+#imports
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
@@ -39,8 +48,7 @@ def populate_seq(region, codon_list):
 				variant_name = str(wt_codon + str(idx + region.begin_num) + alt_codon + '_' + wt_codon.translate() + str(idx + region.begin_num) + Seq(alt_codon).translate()) #generate the name
 				aa_SEQ.append(region.left_handle + str(new_variant) + region.right_handle) #append the variant to a list, with handles
 				names_SEQ.append(variant_name) #append the name to a list
-	#change asteriks to X for writing
-	names_SEQ = [val.replace("*", "X") for val in names_SEQ]
+
 	return(names_SEQ, aa_SEQ)
 
 #write file.
@@ -48,13 +56,13 @@ def file_writer(file, aa_SEQ, names_SEQ):
 	SeqCounter = 0
 	with open(file, 'w+') as f:
 		for idx, dna_seq in enumerate(aa_SEQ):
-			f.write(">TJE_" + names_SEQ[idx] + "\n")
+			f.write(">" + names_SEQ[idx] + "\n")
 			f.write(dna_seq + "\n")
 			SeqCounter += 1
 	print("Sequences written: ", SeqCounter)
 
-def create_seqs(regionA, filename):
-	names_SEQ, aa_SEQ = populate_seq(regionA, codon_list)	
+def create_seqs(region, filename):
+	names_SEQ, aa_SEQ = populate_seq(region, codon_list)	
 	file_writer(filename, aa_SEQ, names_SEQ)
 
 #parse the json file.
