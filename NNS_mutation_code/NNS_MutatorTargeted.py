@@ -4,10 +4,7 @@
 # Written 2021 09 22
 # Updated 2022 10 26
 # Updated 2022 11 02, adding functionality for specific NNS positions in the .json list
-# 3 positional arguments required: 
-#      1. INPUT (json format)
-#      2. Name of sequence (str, must match an entry in the json file)
-#      3. Output (fasta format)
+# Updated 2022 11 03, adding functionality for argsparse
 ##############################
 
 #imports
@@ -17,6 +14,7 @@ from Bio.SeqRecord import SeqRecord
 from collections import defaultdict as dd
 import sys
 import json
+import argparse
 
 class mutagenesis_region: #class of regions
 		def __init__(self, wt_dna_seq, region_id, left_handle, right_handle, positions, begin_num):
@@ -30,11 +28,15 @@ class mutagenesis_region: #class of regions
 			self.right_handle = right_handle
 			self.begin_num = begin_num
 
-codon_list = [] #list of all codons, must be a file called "Codons.txt"
-with open("Codons.txt", 'r') as f:
-	next(f) #skip the header
-	for line in f:
-		codon_list.append(line.split()[0].strip())
+def generate_codon_dicts(file):
+	codon_list = [] #list of all codons, must be a file called "Codons.txt"
+	codon_dict = dd(list)
+	with open(file, 'r') as f:
+		next(f) #skip the header
+		for line in f:
+			codon_list.append(line.split()[0].strip())
+			codon_dict[line.split()[1].strip()].append(line.split()[0].strip())
+	return(codon_list, codon_dict)
 
 def populate_seq(region, codon_list):
 	aa_SEQ, names_SEQ, = [], []
@@ -71,7 +73,8 @@ def file_writer(file, aa_SEQ, names_SEQ):
 			SeqCounter += 1
 	print("Sequences written: ", SeqCounter)
 
-def create_seqs(regionA, filename):
+def create_seqs(regionA, filename, codon_file):
+	codon_list, codon_dict = generate_codon_dicts(codon_file)
 	names_SEQ, aa_SEQ = populate_seq(regionA, codon_list)	
 	file_writer(filename, aa_SEQ, names_SEQ)
 
@@ -89,5 +92,19 @@ def read_json(json_file):
 				begin_num = region['begin_num'])
 	return(all_regions_class)
 
-all_regions_class = read_json(sys.argv[1])
-create_seqs(all_regions_class[sys.argv[2]], sys.argv[3])
+def main():
+	parser = argparse.ArgumentParser(description = 'Generates codon variants of a sequence baesd on user-supplied positions. \n To mutate all position, supply an empty bracket [] in the .json file.') #argument parser
+	parser.add_argument('-o', '--output', help = 'Output file, fasta')
+	parser.add_argument('-i', '--input', help = 'Input file, .json format')
+	parser.add_argument('-s', '--sequence_name', help = 'Name of sequence to query. Must correspond to json entry.')
+	parser.add_argument('-c', '--codons', help = 'tab delimited [codon \\t aa] codon file, with header')
+
+	args = parser.parse_args()
+
+	#main run segment
+	all_regions_class = read_json(args.input)
+	create_seqs(all_regions_class[args.sequence_name], args.output, args.codons)
+
+
+if __name__ == "__main__":
+    main()
