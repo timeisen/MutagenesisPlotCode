@@ -11,7 +11,9 @@
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
+from Bio.Restriction import *
 from collections import defaultdict as dd
+import pdb
 import random 
 import sys
 import json
@@ -50,17 +52,19 @@ def recode(dna_seq, prot_seq, all_codon_dict, num_var):
 		newseq = str(newseq[:(idx * 3)]) + alt_codon + str(newseq[((idx + 1) * 3):])
 	return(str(newseq))
 
-def populate_seq(region, codon_list, all_codon_dict, NUM_ALT_WT):
+def populate_seq(region, codon_list, all_codon_dict, NUM_ALT_WT, enzyme):
 	aa_SEQ, names_SEQ, recode_SEQ, recoded_names = [], [], [], []
 	idx = 0
-
 	while(idx < NUM_ALT_WT):
 		recoded_variant = recode(region.wt_dna_seq.seq, region.wt_prot, all_codon_dict, num_var = 5)
 		if recoded_variant in recode_SEQ: continue #make sure I don't pick the same ones
-		else:
-			recode_SEQ.append(region.left_handle + recoded_variant + region.right_handle)
-			recoded_names.append(region.wt_dna_seq.id + '_' + str(idx))
-			idx += 1
+		elif enzyme is not None:
+			enzymeF = eval(enzyme)
+			if enzymeF.search(Seq(recoded_variant)): continue #make sure I don't pick the same ones
+			else:
+				recode_SEQ.append(region.left_handle + recoded_variant + region.right_handle)
+				recoded_names.append(region.wt_dna_seq.id + '_' + str(idx))
+				idx += 1
 	[aa_SEQ.append(i) for i in recode_SEQ]
 	[names_SEQ.append(i) for i in recoded_names]
 
@@ -82,9 +86,9 @@ def file_writer(file, aa_SEQ, names_SEQ):
 			SeqCounter += 1
 	print("Sequences written: ", SeqCounter)
 
-def create_seqs(regionA, filename, codon_file, NUM_ALT_WT):
+def create_seqs(regionA, filename, codon_file, NUM_ALT_WT, enzyme):
 	codon_list, codon_dict = generate_codon_dicts(codon_file)
-	names_SEQ, aa_SEQ = populate_seq(regionA, codon_list, codon_dict, NUM_ALT_WT)	
+	names_SEQ, aa_SEQ = populate_seq(regionA, codon_list, codon_dict, NUM_ALT_WT, enzyme)	
 	file_writer(filename, aa_SEQ, names_SEQ)
 
 #parse the json file.
@@ -109,11 +113,12 @@ def main():
 	parser.add_argument('-s', '--sequence_name', help = 'Name of sequence to query. Must correspond to json entry.')
 	parser.add_argument('-n', '--number', type = int, help = 'Number of additional sequences to generate')
 	parser.add_argument('-c', '--codons', help = 'tab delimited [codon \\t aa] codon file, with header')
+	parser.add_argument('-e', '--enzyme', help = '[Optional] restriction eyzme site to avoid', required = False)
 
 	args = parser.parse_args()
 
 	all_regions_class = read_json(args.input)
-	create_seqs(all_regions_class[args.sequence_name], args.output, args.codons, args.number)
+	create_seqs(all_regions_class[args.sequence_name], args.output, args.codons, args.number, args.enzyme)
 
 
 if __name__ == "__main__":
