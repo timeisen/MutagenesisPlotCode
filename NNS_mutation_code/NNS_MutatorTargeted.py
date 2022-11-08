@@ -93,9 +93,9 @@ def read_json(json_file):
 	return(all_regions_class)
 
 def main():
-	parser = argparse.ArgumentParser(description = 'Generates codon variants of a sequence baesd on user-supplied positions. \n To mutate all position, supply an empty bracket [] in the .json file.') #argument parser
+	parser = argparse.ArgumentParser(description = 'Generates codon variants of a sequence baesd on user-supplied positions. To mutate all position, supply an empty bracket [] in the .json file.') #argument parser
 	parser.add_argument('-o', '--output', help = 'Output file, fasta')
-	parser.add_argument('-i', '--input', help = 'Input file, .json format')
+	parser.add_argument('-i', '--input', help = 'Input file, .json format. Note that the positions for mutation are determined via a list. Specifying an empty list ([]) generates codons for the whole region.')
 	parser.add_argument('-s', '--sequence_name', help = 'Name of sequence to query. Must correspond to json entry.')
 	parser.add_argument('-c', '--codons', help = 'tab delimited [codon \\t aa] codon file, with header')
 
