@@ -21,7 +21,7 @@ class mutagenesis_region: #class of regions
 			self.wt_dna_seq = SeqRecord(Seq(wt_dna_seq), id = region_id)
 			self.wt_prot = self.wt_dna_seq.translate()
 			self.left_handle = left_handle
-			if positions:
+			if positions: #if the list is not empty.
 				self.positions = [int(i) for i in positions] #convert to int
 			else:
 				self.positions = [int(i) for i in range(self.wt_dna_seq.translate())] #convert to int
@@ -29,7 +29,8 @@ class mutagenesis_region: #class of regions
 			self.begin_num = begin_num
 
 def generate_codon_dicts(file):
-	codon_list = [] #list of all codons, must be a file called "Codons.txt"
+	"""create a dictionary of aa:codon pairs and a list of codons"""
+	codon_list = [] #list of all codons
 	codon_dict = dd(list)
 	with open(file, 'r') as f:
 		next(f) #skip the header
@@ -39,6 +40,7 @@ def generate_codon_dicts(file):
 	return(codon_list, codon_dict)
 
 def populate_seq(region, codon_list):
+	"""given a list of codons, generate sequences where every codon is mutated to every codon in that list."""
 	aa_SEQ, names_SEQ, = [], []
 	#add in the WT sequence:
 	aa_SEQ.append(str(region.left_handle + region.wt_dna_seq.seq + region.right_handle))
@@ -61,8 +63,8 @@ def populate_seq(region, codon_list):
 
 #write file.
 def file_writer(file, aa_SEQ, names_SEQ):
+	"""Write the sequences to a file, in fasta format, and print the total number of sequences written."""
 	SeqCounter = 0
-
 	#change * to X for writing, biopython defaults to asteriks. 
 	names_SEQ = [val.replace("*", "X") for val in names_SEQ]
 
@@ -74,12 +76,15 @@ def file_writer(file, aa_SEQ, names_SEQ):
 	print("Sequences written: ", SeqCounter)
 
 def create_seqs(regionA, filename, codon_file):
+	"""Helper function, mostly designed for cases when it is convenient to 
+	include multiple regions within one sequence (for twist ordering)."""
 	codon_list, codon_dict = generate_codon_dicts(codon_file)
 	names_SEQ, aa_SEQ = populate_seq(regionA, codon_list)	
 	file_writer(filename, aa_SEQ, names_SEQ)
 
 #parse the json file.
 def read_json(json_file):
+	"""Parse the json file and generate a region class"""
 	with open(json_file, 'r') as f:
 		all_regions = json.load(f)
 		all_regions_class = {}
@@ -93,6 +98,7 @@ def read_json(json_file):
 	return(all_regions_class)
 
 def main():
+	"""parse command args"""
 	parser = argparse.ArgumentParser(description = 'Generates codon variants of a sequence baesd on user-supplied positions. To mutate all position, supply an empty bracket [] in the .json file.') #argument parser
 	parser.add_argument('-o', '--output', help = 'Output file, fasta')
 	parser.add_argument('-i', '--input', help = 'Input file, .json format. Note that the positions for mutation are determined via a list. Specifying an empty list ([]) generates codons for the whole region.')
