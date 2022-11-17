@@ -13,7 +13,7 @@ import re
 
 def main():
 	parser = argparse.ArgumentParser(description='find seqs that contain a restriction enzyme site')
-	parser.add_argument('-i', '--input', help = 'Input file, .json format')
+	parser.add_argument('-i', '--input', help = 'Input file, fasta format')
 	parser.add_argument('-e', '--enzyme', help = 'Restriction enzyme to recode. Must be standard naming.')
 	args = parser.parse_args()
 
