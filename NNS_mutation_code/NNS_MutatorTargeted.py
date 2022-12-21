@@ -27,7 +27,7 @@ class mutagenesis_region: #class of regions
 				self.positions = [int(i) for i in positions] #convert to int
 			else:
 				# pdb.set_trace()
-				self.positions = [int(i) for i in range(self.begin_num, self.begin_num + len(self.wt_dna_seq.translate()))] #convert to int
+				self.positions = [i for i in range(self.begin_num, self.begin_num + len(self.wt_dna_seq.translate()))] 
 			self.right_handle = right_handle
 
 def generate_codon_dicts(file):
