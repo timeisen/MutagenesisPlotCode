@@ -20,9 +20,10 @@ pos_table = dd(lambda: dd(int))
 ungapped_dict = {seqname:0 for seqname in all_seqs.keys()}
 for pos in range(seq_length):
 	for seqname, seq in all_seqs.items():
-		if seq[pos] != '-': ungapped_dict[seqname] += 1
-		pos_table[pos][seqname] = ungapped_dict[seqname]
-
+		if seq[pos] != '-': 
+			ungapped_dict[seqname] += 1
+			pos_table[pos][seqname] = ungapped_dict[seqname]
+		else: pos_table[pos][seqname] = 'NA'
 with open(sys.argv[2], 'w+') as f2:
 	header = 'pos' + "\t" + "\t".join([i for i in ungapped_dict.keys()]) + '\n'
 	f2.write(header)

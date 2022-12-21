@@ -15,18 +15,20 @@ from collections import defaultdict as dd
 import sys
 import json
 import argparse
+# import pdb
 
 class mutagenesis_region: #class of regions
 		def __init__(self, wt_dna_seq, region_id, left_handle, right_handle, positions, begin_num):
 			self.wt_dna_seq = SeqRecord(Seq(wt_dna_seq), id = region_id)
 			self.wt_prot = self.wt_dna_seq.translate()
 			self.left_handle = left_handle
+			self.begin_num = begin_num
 			if positions: #if the list is not empty.
 				self.positions = [int(i) for i in positions] #convert to int
 			else:
-				self.positions = [int(i) for i in range(self.wt_dna_seq.translate())] #convert to int
+				# pdb.set_trace()
+				self.positions = [int(i) for i in range(self.begin_num, self.begin_num + len(self.wt_dna_seq.translate()))] #convert to int
 			self.right_handle = right_handle
-			self.begin_num = begin_num
 
 def generate_codon_dicts(file):
 	"""create a dictionary of aa:codon pairs and a list of codons"""
